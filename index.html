@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>NocheOut 🌙</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --accent: #ff3cac;
+    --accent2: #ffad3c;
+    --accent3: #3cffb0;
+    --text: #f0f0ff;
+    --text-muted: #7878a0;
+    --border: rgba(255,255,255,0.06);
+    --glow: rgba(255,60,172,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ─── FONDO ANIMADO ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(255,60,172,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 80% 80%, rgba(60,100,255,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 60% 30%, rgba(255,173,60,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── LAYOUT ─── */
+  .app { position: relative; z-index: 1; max-width: 430px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ─── HEADER ─── */
+  header {
+    padding: 20px 20px 12px;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
+
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; }
+  .logo span { color: var(--accent); text-shadow: 0 0 20px var(--glow); }
+
+  .btn-new {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--glow);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .btn-new:active { transform: scale(0.95); }
+
+  /* ─── TABS ─── */
+  .tabs { display: flex; gap: 8px; margin-top: 12px; }
+  .tab {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .tab.active { background: var(--surface2); color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+  /* ─── MAIN ─── */
+  main { flex: 1; padding: 16px 16px 100px; }
+
+  /* ─── CARDS DE NOCHES ─── */
+  .nights-grid { display: flex; flex-direction: column; gap: 14px; }
+
+  .night-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .night-card:active { transform: scale(0.98); }
+  .night-card:hover { border-color: rgba(255,60,172,0.3); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-photo {
+    width: 100%; height: 160px; object-fit: cover;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    position: relative;
+  }
+
+  .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .card-date-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .card-body { padding: 14px 16px 16px; }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .card-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .stat-pill {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--surface2);
+    border-radius: 50px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .stat-pill .emoji { font-size: 0.85rem; }
+
+  /* colores por tipo */
+  .pill-cubata { color: #ffad3c; }
+  .pill-chupito { color: #ff3cac; }
+  .pill-historia { color: #3cffb0; }
+
+  /* ─── VISTA DETALLE ─── */
+  .detail-view {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+  }
+  .detail-view.open { display: block; }
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0.5; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .detail-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 20px 14px;
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .btn-back {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50px; width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; cursor: pointer; flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .btn-back:active { background: var(--surface); }
+
+  .detail-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 1px; }
+
+  .detail-photo {
+    width: 100%; height: 220px; position: relative;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; overflow: hidden;
+  }
+  .detail-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .detail-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--bg) 0%, transparent 50%);
+  }
+
+  .detail-body { padding: 16px; }
+
+  .section-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 10px;
+    margin-top: 20px;
+  }
+
+  /* contadores */
+  .counters-row { display: flex; gap: 10px; }
+
+  .counter-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .counter-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .counter-card.cubata::before { background: var(--accent2); }
+  .counter-card.chupito::before { background: var(--accent); }
+  .counter-card.historia::before { background: var(--accent3); }
+
+  .counter-emoji { font-size: 1.5rem; margin-bottom: 4px; display: block; }
+  .counter-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; line-height: 1; display: block; }
+  .counter-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
+
+  .counter-btns { display: flex; gap: 6px; margin-top: 8px; justify-content: center; }
+  .counter-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50px; width: 28px; height: 28px;
+    font-size: 1rem; cursor: pointer; color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .counter-btn:active { background: rgba(255,255,255,0.1); }
+  .counter-btn.plus { background: rgba(255,255,255,0.07); }
+
+  /* momentos / historias */
+  .moment-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .moment-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex; gap: 10px; align-items: flex-start;
+    position: relative;
+  }
+
+  .moment-emoji-big { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+  .moment-text { font-size: 0.88rem; line-height: 1.5; color: var(--text); flex: 1; }
+  .moment-delete {
+    background: none; border: none; color: var(--text-muted);
+    font-size: 1rem; cursor: pointer; flex-shrink: 0;
+    padding: 2px; transition: color 0.15s;
+  }
+  .moment-delete:active { color: var(--accent); }
+
+  .add-moment-row { display: flex; gap: 8px; margin-top: 10px; }
+  .input-moment {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-moment:focus { border-color: rgba(255,60,172,0.4); }
+  .input-moment::placeholder { color: var(--text-muted); }
+
+  .btn-add-moment {
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    width: 44px; height: 44px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--glow);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  .btn-add-moment:active { transform: scale(0.9); }
+
+  /* fotos */
+  .photos-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .photos-scroll::-webkit-scrollbar { display: none; }
+
+  .photo-thumb {
+    flex-shrink: 0; width: 90px; height: 90px;
+    border-radius: 12px; overflow: hidden;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    cursor: pointer; position: relative;
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .photo-add {
+    flex-shrink: 0; width: 90px; height: 90px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255,255,255,0.2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; color: var(--text-muted);
+    font-size: 1.5rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .photo-add:active { border-color: var(--accent); color: var(--accent); }
+  .photo-add span { font-size: 0.65rem; font-weight: 500; }
+
+  /* ─── MODAL NUEVA NOCHE ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    align-items: flex-end;
+    animation: fadeOverlay 0.2s ease;
+  }
+  .modal-overlay.open { display: flex; }
+
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal-sheet {
+    width: 100%; max-width: 430px; margin: 0 auto;
+    background: var(--surface);
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid var(--border);
+    padding: 20px 20px 40px;
+    animation: sheetUp 0.3s ease;
+  }
+
+  @keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 50px; margin: 0 auto 20px; }
+  .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 1px; margin-bottom: 18px; }
+
+  .field-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; margin-top: 14px; }
+
+  .input-field {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: rgba(255,60,172,0.5); }
+  .input-field::placeholder { color: var(--text-muted); }
+
+  .btn-create {
+    width: 100%; margin-top: 20px;
+    background: var(--accent);
+    color: white; border: none;
+    border-radius: 14px;
+    padding: 15px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 0 30px var(--glow);
+    transition: transform 0.15s;
+  }
+  .btn-create:active { transform: scale(0.98); }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px; text-align: center; gap: 14px;
+  }
+  .empty-emoji { font-size: 4rem; }
+  .empty-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; }
+  .empty-sub { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; max-width: 260px; }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50px; padding: 8px 18px;
+    font-size: 0.82rem; font-weight: 500;
+    opacity: 0; transition: all 0.3s;
+    z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── BOTTOM NAV ─── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
+    max-width: 430px; margin: 0 auto;
+    left: 50%; transform: translateX(-50%);
+  }
+
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; color: var(--text-muted); font-size: 0.62rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    transition: color 0.2s;
+    padding: 4px 14px;
+  }
+  .nav-item .nav-icon { font-size: 1.4rem; }
+  .nav-item.active { color: var(--accent); }
+
+  /* ─── LIGHTBOX FOTO ─── */
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.95);
+    align-items: center; justify-content: center;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 95%; max-height: 85vh; border-radius: 12px; object-fit: contain; }
+  .lightbox-close {
+    position: absolute; top: 20px; right: 20px;
+    background: var(--surface2); border: none;
+    border-radius: 50px; width: 36px; height: 36px;
+    font-size: 1rem; color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* hidden input */
+  #fileInput { display: none; }
+
+  /* ─── GAME VIEW ─── */
+  .game-view {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: var(--bg);
+    overflow-y: auto;
+    animation: slideIn 0.3s ease;
+    max-width: 430px; margin: 0 auto;
+  }
+  .game-view.open { display: block; }
+
+  .game-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 20px 14px;
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .game-body { padding: 20px 16px 120px; }
+
+  /* jugadores */
+  .players-section { margin-bottom: 24px; }
+  .players-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+
+  .player-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 50px; padding: 6px 12px 6px 10px;
+    font-size: 0.82rem; font-weight: 500;
+    animation: fadeUp 0.2s ease;
+  }
+  .player-chip .avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: #000;
+  }
+  .player-chip .remove-player {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 0.9rem; line-height: 1;
+    padding: 0; margin-left: 2px;
+  }
+
+  .add-player-row { display: flex; gap: 8px; }
+  .input-player {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    color: var(--text); outline: none; transition: border-color 0.2s;
+  }
+  .input-player:focus { border-color: rgba(255,60,172,0.4); }
+  .input-player::placeholder { color: var(--text-muted); }
+  .btn-add-player {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; width: 44px; height: 44px;
+    font-size: 1.3rem; cursor: pointer; color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .btn-add-player:active { background: rgba(255,255,255,0.1); }
+
+  /* turno actual */
+  .turn-banner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .turn-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 700; color: #000; flex-shrink: 0;
+  }
+  .turn-info { flex: 1; }
+  .turn-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; }
+  .turn-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 1px; }
+
+  /* carta */
+  .card-area {
+    perspective: 1000px;
+    margin-bottom: 20px;
+    min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .game-card {
+    width: 100%;
+    min-height: 200px;
+    border-radius: 24px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 28px 24px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+    transform-style: preserve-3d;
+  }
+  .game-card:active { transform: scale(0.97); }
+
+  .game-card.verdad {
+    background: linear-gradient(135deg, #1a1a3e 0%, #0d0d2e 100%);
+    border: 1px solid rgba(100,100,255,0.3);
+    box-shadow: 0 0 40px rgba(80,80,255,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .game-card.reto {
+    background: linear-gradient(135deg, #2e0a1a 0%, #1a0010 100%);
+    border: 1px solid rgba(255,60,172,0.3);
+    box-shadow: 0 0 40px rgba(255,60,172,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .game-card.idle {
+    background: var(--surface);
+    border: 2px dashed rgba(255,255,255,0.1);
+    box-shadow: none;
+  }
+
+  .game-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.04), transparent);
+    pointer-events: none;
+  }
+
+  .card-type-badge {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px;
+    font-weight: 700; margin-bottom: 14px; opacity: 0.7;
+  }
+  .verdad .card-type-badge { color: #8888ff; }
+  .reto .card-type-badge { color: var(--accent); }
+
+  .card-big-emoji { font-size: 3.5rem; margin-bottom: 12px; display: block; }
+  .card-text {
+    font-size: 1.05rem; line-height: 1.55; font-weight: 500;
+    color: var(--text);
+  }
+  .card-idle-text { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+  @keyframes cardReveal {
+    0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+    100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+  }
+  .card-reveal { animation: cardReveal 0.35s ease; }
+
+  /* botones de acción */
+  .game-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+
+  .btn-verdad, .btn-reto, .btn-pass {
+    flex: 1; border: none; border-radius: 14px;
+    padding: 14px 10px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem; letter-spacing: 1.5px;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-verdad:active, .btn-reto:active, .btn-pass:active { transform: scale(0.96); }
+
+  .btn-verdad {
+    background: linear-gradient(135deg, #4444ff, #2222cc);
+    color: white; box-shadow: 0 0 20px rgba(80,80,255,0.3);
+  }
+  .btn-reto {
+    background: linear-gradient(135deg, var(--accent), #cc1188);
+    color: white; box-shadow: 0 0 20px var(--glow);
+  }
+
+  .btn-pass {
+    flex: 0 0 auto;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.75rem; letter-spacing: 1px;
+    padding: 14px 14px;
+  }
+
+  /* chupito penalty */
+  .chupito-btn {
+    width: 100%;
+    background: var(--surface); border: 1px solid rgba(255,173,60,0.3);
+    border-radius: 14px; padding: 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    color: var(--accent2); cursor: pointer; font-weight: 600;
+    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .chupito-btn:active { background: rgba(255,173,60,0.1); }
+
+  /* historial */
+  .history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .history-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 12px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .history-badge {
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 700; border-radius: 4px; padding: 2px 6px;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .badge-v { background: rgba(80,80,255,0.2); color: #8888ff; }
+  .badge-r { background: rgba(255,60,172,0.2); color: var(--accent); }
+  .history-item-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+  .history-item-player { font-weight: 600; color: var(--text); font-size: 0.82rem; }
+
+  /* marcador */
+  .scoreboard {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .score-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 50px; padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .score-chip .s-avatar {
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; color: #000;
+  }
+  .score-chip .s-count { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--accent2); }
+
+  /* nav bottom */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 20px calc(10px + env(safe-area-inset-bottom));
+    z-index: 150;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    cursor: pointer; color: var(--text-muted); font-size: 0.62rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    transition: color 0.2s; padding: 4px 14px;
+  }
+  .nav-item .nav-icon { font-size: 1.4rem; }
+  .nav-item.active { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ─── HEADER ─── -->
+  <header>
+    <div class="header-row">
+      <div class="logo">Noche<span>Out</span> 🌙</div>
+      <button class="btn-new" onclick="openModal()">+ Nueva noche</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="setTab('todas', this)">Todas</button>
+      <button class="tab" onclick="setTab('recientes', this)">Recientes</button>
+    </div>
+  </header>
+
+  <!-- ─── MAIN ─── -->
+  <main>
+    <div class="nights-grid" id="nightsGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-emoji">🎉</div>
+      <div class="empty-title">¡Primera noche!</div>
+      <div class="empty-sub">Crea tu primer recap de salida y empieza a contar los cubatas 🍹</div>
+    </div>
+  </main>
+
+</div>
+
+<!-- ─── BOTTOM NAV ─── -->
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-noches" onclick="switchTab('noches')">
+    <span class="nav-icon">🌙</span>
+    <span>Noches</span>
+  </div>
+  <div class="nav-item" id="nav-juego" onclick="switchTab('juego')">
+    <span class="nav-icon">🎲</span>
+    <span>Juego</span>
+  </div>
+</nav>
+
+<!-- ─── GAME VIEW ─── -->
+<div class="game-view" id="gameView">
+  <div class="game-header">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px">🎲 Verdad o Reto</div>
+  </div>
+  <div class="game-body">
+
+    <div class="section-label">👥 Jugadores</div>
+    <div class="players-row" id="playersRow"></div>
+    <div class="add-player-row">
+      <input type="text" class="input-player" id="playerInput" placeholder="Nombre del jugador..." maxlength="20">
+      <button class="btn-add-player" onclick="addPlayer()">+</button>
+    </div>
+
+    <div id="gameSection" style="display:none; margin-top:24px">
+
+      <div class="section-label">🥃 Chupitos por jugador</div>
+      <div class="scoreboard" id="scoreboard"></div>
+
+      <div class="section-label">🎯 Turno actual</div>
+      <div class="turn-banner">
+        <div class="turn-avatar" id="turnAvatar" style="background:#ff3cac">?</div>
+        <div class="turn-info">
+          <div class="turn-label">Le toca a</div>
+          <div class="turn-name" id="turnName">—</div>
+        </div>
+      </div>
+
+      <div class="card-area">
+        <div class="game-card idle" id="gameCard">
+          <span class="card-big-emoji">🃏</span>
+          <div class="card-idle-text">Elige <strong>Verdad</strong> o <strong>Reto</strong><br>para revelar la carta</div>
+        </div>
+      </div>
+
+      <div class="game-actions">
+        <button class="btn-verdad" onclick="drawCard('verdad')">💬 VERDAD</button>
+        <button class="btn-reto" onclick="drawCard('reto')">🔥 RETO</button>
+        <button class="btn-pass" onclick="nextTurn()">PASAR</button>
+      </div>
+
+      <button class="chupito-btn" onclick="addChupito()">
+        🥃 <span id="chupitoLabel">Sumar chupito al jugador actual</span>
+      </button>
+
+      <div class="section-label" style="margin-top:24px">📜 Historial de la noche</div>
+      <div class="history-list" id="historyList">
+        <div style="color:var(--text-muted);font-size:0.82rem;text-align:center;padding:16px">Aún no hay jugadas</div>
+      </div>
+
+    </div>
+
+    <div id="noPlayersMsg" style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:0.88rem;line-height:1.6">
+      Añade al menos <strong style="color:var(--text)">2 jugadores</strong> para empezar 👆
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── DETALLE ─── -->
+<div class="detail-view" id="detailView">
+  <div class="detail-header">
+    <button class="btn-back" onclick="closeDetail()">←</button>
+    <div class="detail-title" id="detailTitle">Noche épica</div>
+  </div>
+
+  <div class="detail-photo" id="detailPhotoWrap">
+    <span id="detailPhotoEmoji">🎊</span>
+    <div class="detail-photo-overlay"></div>
+  </div>
+
+  <div class="detail-body">
+
+    <!-- Contadores -->
+    <div class="section-label">📊 Contador de la noche</div>
+    <div class="counters-row">
+      <div class="counter-card cubata">
+        <span class="counter-emoji">🍹</span>
+        <span class="counter-num" id="cnt-cubata">0</span>
+        <span class="counter-label">Cubatas</span>
+        <div class="counter-btns">
+          <button class="counter-btn" onclick="changeCount('cubata',-1)">−</button>
+          <button class="counter-btn plus" onclick="changeCount('cubata',1)">+</button>
+        </div>
+      </div>
+      <div class="counter-card chupito">
+        <span class="counter-emoji">🥃</span>
+        <span class="counter-num" id="cnt-chupito">0</span>
+        <span class="counter-label">Chupitos</span>
+        <div class="counter-btns">
+          <button class="counter-btn" onclick="changeCount('chupito',-1)">−</button>
+          <button class="counter-btn plus" onclick="changeCount('chupito',1)">+</button>
+        </div>
+      </div>
+      <div class="counter-card historia">
+        <span class="counter-emoji">😂</span>
+        <span class="counter-num" id="cnt-momento">0</span>
+        <span class="counter-label">Momentos</span>
+      </div>
+    </div>
+
+    <!-- Fotos -->
+    <div class="section-label">📸 Fotos</div>
+    <div class="photos-scroll" id="photoScroll">
+      <div class="photo-add" onclick="triggerPhoto()">
+        <span>+</span>
+        <span>Foto</span>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="addPhotos(event)">
+
+    <!-- Momentos graciosos -->
+    <div class="section-label">😂 Momentos épicos</div>
+    <div class="moment-list" id="momentList"></div>
+    <div class="add-moment-row">
+      <input type="text" class="input-moment" id="momentInput" placeholder="Cuenta qué pasó..." maxlength="200">
+      <button class="btn-add-moment" onclick="addMoment()">+</button>
+    </div>
+
+    <!-- Descripción general -->
+    <div class="section-label">📝 Descripción general</div>
+    <textarea class="input-field" id="detailDesc" rows="3" placeholder="¿Cómo fue la noche en general?" style="resize:none; line-height:1.5" oninput="saveDesc()"></textarea>
+
+    <div style="margin-top:30px; padding:14px; background:var(--surface); border-radius:14px; border:1px solid var(--border); text-align:center;">
+      <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:8px;">COMPARTE EL RECAP</div>
+      <div style="font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:1px;" id="shareText"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── MODAL NUEVA NOCHE ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Nueva noche 🎉</div>
+
+    <div class="field-label">Nombre de la noche</div>
+    <input type="text" class="input-field" id="newNightName" placeholder="Ej: Cumpleaños de Javi">
+
+    <div class="field-label">Lugar</div>
+    <input type="text" class="input-field" id="newNightPlace" placeholder="Ej: La Sal, Pamplona">
+
+    <div class="field-label">Fecha</div>
+    <input type="date" class="input-field" id="newNightDate">
+
+    <div class="field-label">Quiénes erais</div>
+    <input type="text" class="input-field" id="newNightPeople" placeholder="Ej: Javi, Marta, Sergio...">
+
+    <button class="btn-create" onclick="createNight()">CREAR NOCHE 🚀</button>
+  </div>
+</div>
+
+<!-- ─── LIGHTBOX ─── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───
+let nights = JSON.parse(localStorage.getItem('nocheout_nights') || '[]');
+let currentNightId = null;
+
+function save() {
+  localStorage.setItem('nocheout_nights', JSON.stringify(nights));
+}
+
+function getCurrentNight() {
+  return nights.find(n => n.id === currentNightId);
+}
+
+// ─── RENDER GRID ───
+function renderGrid() {
+  const grid = document.getElementById('nightsGrid');
+  const empty = document.getElementById('emptyState');
+  grid.innerHTML = '';
+
+  if (nights.length === 0) {
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  nights.slice().reverse().forEach((night, i) => {
+    const card = document.createElement('div');
+    card.className = 'night-card';
+    card.style.animationDelay = (i * 0.07) + 's';
+    card.onclick = () => openDetail(night.id);
+
+    const photoEl = night.photos && night.photos[0]
+      ? `<img src="${night.photos[0]}" alt="">`
+      : `<span>🎊</span>`;
+
+    const dateStr = night.date
+      ? new Date(night.date + 'T12:00:00').toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' })
+      : 'Sin fecha';
+
+    card.innerHTML = `
+      <div class="card-photo">
+        ${photoEl}
+        <div class="card-date-badge">📅 ${dateStr}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${night.name}</div>
+        ${night.place ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px">📍 ${night.place}</div>` : ''}
+        <div class="card-stats">
+          <div class="stat-pill pill-cubata"><span class="emoji">🍹</span> ${night.cubatas} cubatas</div>
+          <div class="stat-pill pill-chupito"><span class="emoji">🥃</span> ${night.chupitos} chupitos</div>
+          <div class="stat-pill pill-historia"><span class="emoji">😂</span> ${night.moments.length} momentos</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ─── MODAL ───
+function openModal() {
+  document.getElementById('newNightDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function createNight() {
+  const name = document.getElementById('newNightName').value.trim();
+  if (!name) { showToast('Ponle un nombre a la noche 😅'); return; }
+
+  const night = {
+    id: Date.now(),
+    name,
+    place: document.getElementById('newNightPlace').value.trim(),
+    date: document.getElementById('newNightDate').value,
+    people: document.getElementById('newNightPeople').value.trim(),
+    cubatas: 0,
+    chupitos: 0,
+    moments: [],
+    photos: [],
+    desc: ''
+  };
+
+  nights.push(night);
+  save();
+  closeModal();
+  renderGrid();
+  // reset
+  ['newNightName','newNightPlace','newNightPeople'].forEach(id => document.getElementById(id).value = '');
+
+  setTimeout(() => openDetail(night.id), 200);
+}
+
+// ─── DETALLE ───
+function openDetail(id) {
+  currentNightId = id;
+  const night = getCurrentNight();
+  if (!night) return;
+
+  document.getElementById('detailTitle').textContent = night.name;
+
+  // foto portada
+  const wrap = document.getElementById('detailPhotoWrap');
+  const existingImg = wrap.querySelector('img');
+  if (existingImg) existingImg.remove();
+  if (night.photos && night.photos[0]) {
+    const img = document.createElement('img');
+    img.src = night.photos[0];
+    img.alt = '';
+    wrap.insertBefore(img, wrap.firstChild);
+    document.getElementById('detailPhotoEmoji').style.display = 'none';
+  } else {
+    document.getElementById('detailPhotoEmoji').style.display = 'block';
+  }
+
+  document.getElementById('cnt-cubata').textContent = night.cubatas;
+  document.getElementById('cnt-chupito').textContent = night.chupitos;
+  document.getElementById('cnt-momento').textContent = night.moments.length;
+  document.getElementById('detailDesc').value = night.desc || '';
+
+  renderPhotos();
+  renderMoments();
+  updateShare();
+
+  document.getElementById('detailView').classList.add('open');
+  document.getElementById('detailView').scrollTop = 0;
+}
+
+function closeDetail() {
+  document.getElementById('detailView').classList.remove('open');
+  renderGrid();
+}
+
+// ─── CONTADORES ───
+function changeCount(type, delta) {
+  const night = getCurrentNight();
+  if (!night) return;
+  const key = type === 'cubata' ? 'cubatas' : 'chupitos';
+  night[key] = Math.max(0, (night[key] || 0) + delta);
+  document.getElementById('cnt-' + type).textContent = night[key];
+  save();
+  updateShare();
+}
+
+// ─── MOMENTOS ───
+function renderMoments() {
+  const night = getCurrentNight();
+  const list = document.getElementById('momentList');
+  list.innerHTML = '';
+
+  const emojis = ['😂','🤣','💀','🫠','🔥','⚡','🫡','👀','🤦','😭'];
+
+  (night.moments || []).forEach((m, i) => {
+    const el = document.createElement('div');
+    el.className = 'moment-item';
+    const emoji = emojis[i % emojis.length];
+    el.innerHTML = `
+      <span class="moment-emoji-big">${emoji}</span>
+      <span class="moment-text">${escapeHtml(m)}</span>
+      <button class="moment-delete" onclick="deleteMoment(${i})">✕</button>
+    `;
+    list.appendChild(el);
+  });
+
+  document.getElementById('cnt-momento').textContent = night.moments.length;
+}
+
+function addMoment() {
+  const input = document.getElementById('momentInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const night = getCurrentNight();
+  night.moments.push(text);
+  input.value = '';
+  save();
+  renderMoments();
+  updateShare();
+}
+
+function deleteMoment(i) {
+  const night = getCurrentNight();
+  night.moments.splice(i, 1);
+  save();
+  renderMoments();
+  updateShare();
+}
+
+document.getElementById('momentInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addMoment(); }
+});
+
+// ─── FOTOS ───
+function triggerPhoto() {
+  document.getElementById('fileInput').click();
+}
+
+function addPhotos(event) {
+  const night = getCurrentNight();
+  const files = Array.from(event.target.files);
+
+  let processed = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      night.photos.push(e.target.result);
+      processed++;
+      if (processed === files.length) {
+        save();
+        renderPhotos();
+        // actualiza portada si es la primera foto
+        if (night.photos.length === files.length) openDetail(night.id);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderPhotos() {
+  const night = getCurrentNight();
+  const scroll = document.getElementById('photoScroll');
+  scroll.innerHTML = `<div class="photo-add" onclick="triggerPhoto()"><span>+</span><span>Foto</span></div>`;
+
+  (night.photos || []).forEach((src, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'photo-thumb';
+    thumb.innerHTML = `<img src="${src}" alt="" onclick="openLightbox('${src}')">`;
+    scroll.appendChild(thumb);
+  });
+}
+
+// ─── LIGHTBOX ───
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ─── DESCRIPCIÓN ───
+function saveDesc() {
+  const night = getCurrentNight();
+  if (!night) return;
+  night.desc = document.getElementById('detailDesc').value;
+  save();
+}
+
+// ─── SHARE TEXT ───
+function updateShare() {
+  const night = getCurrentNight();
+  if (!night) return;
+  const txt = `🌙 ${night.name} | 🍹 ${night.cubatas} cubatas · 🥃 ${night.chupitos} chupitos · 😂 ${night.moments.length} momentos épicos`;
+  document.getElementById('shareText').textContent = txt;
+}
+
+// ─── TABS ───
+function setTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+
+  if (tab === 'recientes') {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    renderGridFiltered(nights.filter(n => n.id > cutoff));
+  } else {
+    renderGrid();
+  }
+}
+
+function renderGridFiltered(list) {
+  const grid = document.getElementById('nightsGrid');
+  const empty = document.getElementById('emptyState');
+  grid.innerHTML = '';
+
+  if (list.length === 0) {
+    empty.style.display = 'flex';
+    empty.querySelector('.empty-title').textContent = 'Sin noches recientes';
+    empty.querySelector('.empty-sub').textContent = 'No hay salidas de los últimos 7 días';
+    return;
+  }
+  empty.style.display = 'none';
+  // reutiliza la lógica
+  const backup = nights;
+  nights = list;
+  renderGrid();
+  nights = backup;
+}
+
+// ─── UTILS ───
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── SWITCH TAB ───
+function switchTab(tab) {
+  document.getElementById('nav-noches').classList.toggle('active', tab === 'noches');
+  document.getElementById('nav-juego').classList.toggle('active', tab === 'juego');
+
+  if (tab === 'juego') {
+    document.getElementById('gameView').classList.add('open');
+  } else {
+    document.getElementById('gameView').classList.remove('open');
+  }
+}
+
+// ─── JUEGO: DATA ───
+const PLAYER_COLORS = ['#ffad3c','#ff3cac','#3cffb0','#3c9fff','#ff6b3c','#c03cff'];
+let players = []; // {name, color, chupitos}
+let currentPlayerIdx = 0;
+let gameHistory = [];
+
+const VERDADES = [
+  "¿Cuál es lo más vergonzoso que has hecho borracho?",
+  "¿A quién de aquí le mandarías un mensaje si estuvieras bebido ahora mismo?",
+  "¿Cuál es tu mayor crush secreto?",
+  "¿Has mentido hoy? ¿Sobre qué?",
+  "¿Cuál es la cosa más rara que has googled esta semana?",
+  "¿A quién de este grupo llamarías a las 3am si tuvieras un problema?",
+  "¿Cuál es el peor plan en el que has participado sin querer?",
+  "¿Tienes alguna fobia ridícula que no le has contado a nadie?",
+  "¿Cuál es tu más oscuro secreto de redes sociales? ¿Stalking a exs?",
+  "¿Qué canción pones cuando nadie te ve y te pones a cantar?",
+  "¿Cuál es la mentira más gorda que has dicho esta semana?",
+  "¿Qué es lo que más te da vergüenza admitir que te gusta?",
+  "¿Has robado algo alguna vez? ¿Qué fue?",
+  "¿Cuál es el mensaje más cringe que has enviado?",
+  "¿A quién de este grupo le pedirías dinero si lo necesitaras?",
+];
+
+const RETOS = [
+  "Imita a alguien del grupo durante 30 segundos. Los demás adivinan.",
+  "Llama a alguien de tus contactos y dile que te has casado.",
+  "Haz 10 flexiones ahora mismo. Si fallas, chupito doble.",
+  "Di los trabalenguas del arroz sin equivocarte. Si fallas, chupito.",
+  "Escribe un mensaje de amor a tu último contacto y enséñalo antes de enviarlo.",
+  "Habla con acento extranjero durante las próximas 3 rondas.",
+  "Deja que el grupo te elija una historia de Instagram que subir.",
+  "Imita el baile más ridículo que puedas durante 20 segundos.",
+  "Di 5 cosas buenas del jugador a tu derecha sin parar.",
+  "Chupito directo. Sin excusas. El juego manda.",
+  "Intercambia el teléfono con el jugador de tu izquierda durante 1 minuto.",
+  "Haz una declaración dramática de amor a un objeto de la sala.",
+  "Canta el estribillo de la última canción que escuchaste.",
+  "Deja que el grupo te escriba un tweet en tu nombre.",
+  "El grupo elige quién del grupo te da un abrazo de oso por 10 segundos.",
+];
+
+// ─── JUGADORES ───
+function addPlayer() {
+  const input = document.getElementById('playerInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (players.length >= 6) { showToast('Máximo 6 jugadores 😅'); return; }
+  if (players.find(p => p.name.toLowerCase() === name.toLowerCase())) {
+    showToast('Ese jugador ya está 👀'); return;
+  }
+
+  players.push({ name, color: PLAYER_COLORS[players.length], chupitos: 0 });
+  input.value = '';
+  renderPlayers();
+  updateGameSection();
+}
+
+document.getElementById('playerInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addPlayer(); }
+});
+
+function removePlayer(i) {
+  players.splice(i, 1);
+  if (currentPlayerIdx >= players.length) currentPlayerIdx = 0;
+  renderPlayers();
+  updateGameSection();
+}
+
+function renderPlayers() {
+  const row = document.getElementById('playersRow');
+  row.innerHTML = '';
+  players.forEach((p, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'player-chip';
+    chip.innerHTML = `
+      <div class="avatar" style="background:${p.color}">${p.name[0].toUpperCase()}</div>
+      ${escapeHtml(p.name)}
+      <button class="remove-player" onclick="removePlayer(${i})">✕</button>
+    `;
+    row.appendChild(chip);
+  });
+}
+
+function updateGameSection() {
+  const show = players.length >= 2;
+  document.getElementById('gameSection').style.display = show ? 'block' : 'none';
+  document.getElementById('noPlayersMsg').style.display = show ? 'none' : 'block';
+  if (show) {
+    renderTurn();
+    renderScoreboard();
+  }
+}
+
+// ─── TURNO ───
+function renderTurn() {
+  if (!players.length) return;
+  const p = players[currentPlayerIdx];
+  document.getElementById('turnName').textContent = p.name;
+  document.getElementById('turnAvatar').textContent = p.name[0].toUpperCase();
+  document.getElementById('turnAvatar').style.background = p.color;
+  document.getElementById('chupitoLabel').textContent = `Sumar chupito a ${p.name}`;
+  // Reset carta
+  const card = document.getElementById('gameCard');
+  card.className = 'game-card idle';
+  card.innerHTML = `<span class="card-big-emoji">🃏</span><div class="card-idle-text">Elige <strong>Verdad</strong> o <strong>Reto</strong><br>para revelar la carta</div>`;
+}
+
+function nextTurn() {
+  currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+  renderTurn();
+}
+
+// ─── CARTA ───
+function drawCard(type) {
+  const p = players[currentPlayerIdx];
+  const list = type === 'verdad' ? VERDADES : RETOS;
+  const text = list[Math.floor(Math.random() * list.length)];
+  const emoji = type === 'verdad' ? '💬' : '🔥';
+  const label = type === 'verdad' ? 'Verdad' : 'Reto';
+
+  const card = document.getElementById('gameCard');
+  card.className = `game-card ${type} card-reveal`;
+
+  card.innerHTML = `
+    <div class="card-type-badge">${label}</div>
+    <span class="card-big-emoji">${emoji}</span>
+    <div class="card-text">${escapeHtml(text)}</div>
+  `;
+
+  // Quitar animación para que se pueda reusar
+  setTimeout(() => card.classList.remove('card-reveal'), 400);
+
+  // Añadir al historial
+  gameHistory.unshift({ player: p.name, color: p.color, type, text });
+  renderHistory();
+
+  // Si es reto de chupito directo, sumarlo automáticamente
+  if (text.includes('Chupito directo')) {
+    setTimeout(() => {
+      p.chupitos++;
+      renderScoreboard();
+      showToast(`🥃 Chupito sumado a ${p.name}`);
+    }, 600);
+  }
+}
+
+// ─── CHUPITO MANUAL ───
+function addChupito() {
+  if (!players.length) return;
+  const p = players[currentPlayerIdx];
+  p.chupitos++;
+  renderScoreboard();
+  showToast(`🥃 +1 chupito a ${p.name}`);
+}
+
+// ─── SCOREBOARD ───
+function renderScoreboard() {
+  const board = document.getElementById('scoreboard');
+  board.innerHTML = '';
+  players.forEach(p => {
+    const chip = document.createElement('div');
+    chip.className = 'score-chip';
+    chip.innerHTML = `
+      <div class="s-avatar" style="background:${p.color}">${p.name[0].toUpperCase()}</div>
+      <span style="font-size:0.82rem">${escapeHtml(p.name)}</span>
+      <span class="s-count">${p.chupitos}</span>
+      <span style="font-size:0.7rem;color:var(--text-muted)">🥃</span>
+    `;
+    board.appendChild(chip);
+  });
+}
+
+// ─── HISTORIAL ───
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!gameHistory.length) {
+    list.innerHTML = `<div style="color:var(--text-muted);font-size:0.82rem;text-align:center;padding:16px">Aún no hay jugadas</div>`;
+    return;
+  }
+  list.innerHTML = '';
+  gameHistory.slice(0, 10).forEach(h => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.innerHTML = `
+      <span class="history-badge ${h.type === 'verdad' ? 'badge-v' : 'badge-r'}">${h.type === 'verdad' ? 'V' : 'R'}</span>
+      <div>
+        <div class="history-item-player" style="color:${h.color}">${escapeHtml(h.player)}</div>
+        <div class="history-item-text">${escapeHtml(h.text)}</div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ─── INIT ───
+renderGrid();
+</script>
+</body>
+</html>
